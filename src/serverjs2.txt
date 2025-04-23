@@ -1,0 +1,51 @@
+// main/server.js
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const { createObjectCsvWriter } = require('csv-writer');
+
+const FILE_PATH = path.join(__dirname, '..', 'output.csv');
+
+const csvWriter = createObjectCsvWriter({
+  path: FILE_PATH,
+  header: [
+    { id: 'raw', title: 'Raw' },
+    { id: 'type', title: 'Type' }
+  ],
+  append: true
+});
+
+function startServer(win, port = 5000) {
+  const app = express();
+  app.use(cors());
+  app.use(express.json());
+
+  app.post('/data', (req, res) => {
+    const { raw, type } = req.body;
+    if (!raw || !type) return res.status(400).send('Missing raw or type');
+
+    const rowData = { raw, type };
+
+    // Write to CSV
+    csvWriter.writeRecords([rowData])
+      .then(() => {
+        // Send to renderer
+        if (win && win.webContents) {
+          win.webContents.send('new-scan', rowData);
+        }
+
+        res.json({ status: 'Success', received: req.body });
+      })
+      .catch((err) => {
+        console.error('CSV error:', err.message);
+        res.status(500).send('CSV write error');
+      });
+  });
+
+  app.listen(port, () => {
+    console.log(`Server running on http://0.0.0.0:${port}`);
+  });
+}
+
+module.exports = { startServer };

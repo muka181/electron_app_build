@@ -1,0 +1,10 @@
+// public/renderer.js
+const { ipcRenderer } = require('electron');
+
+const scannedList = document.getElementById('scanned-list');
+
+ipcRenderer.on('new-scan', (event, data) => {
+  const li = document.createElement('li');
+  li.textContent = `Raw: ${data.raw}, Type: ${data.type}`;
+  scannedList.prepend(li); // Newest on top
+});
