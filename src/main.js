@@ -21,7 +21,7 @@ function createWindow() {
 
   mainWindow.webContents.openDevTools();
 
-  // Start server and pass the window reference
+  // Start server 
   startServer();
 }
 

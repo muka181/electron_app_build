@@ -7,7 +7,7 @@ socket.on('connect', () => {
 
 // Listen for the 'scan' event and update the UI with the received scan data
 socket.on('scan', (data) => {
-  console.log('console scan data:', data); 
+  
   console.log('Received scan data:', data); // Log the received data for debugging
   
   if (data && data.raw && data.type) { // Ensure the data is valid before using it
